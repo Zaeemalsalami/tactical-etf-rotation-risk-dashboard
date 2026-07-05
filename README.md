@@ -115,11 +115,7 @@ This project is not intended to be automatic trading advice. It is an educationa
 - `requirements.txt`: Required Python libraries
 - `README.md`: Project documentation
 - `charts/`: Saved charts and visualizations
-- `data/`: Strategy data outputs
-
-## Resume Bullet
-
-Built a Python-based tactical ETF rotation model designed to generate competitive returns while controlling downside risk and minimizing drawdowns. The strategy allocates across equities, bonds, gold, emerging markets, and cash using momentum, trend, and volatility signals; backtested performance against SPY and a 60/40 portfolio, incorporated transaction costs, avoided lookahead bias, and developed an interactive Streamlit risk dashboard with CAGR, Sharpe ratio, volatility, drawdown, allocation, and correlation analytics.
+- `data/`: Strategy data 
 
 ## Disclaimer
 
