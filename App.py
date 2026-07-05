@@ -702,31 +702,69 @@ st.plotly_chart(fig_vol, use_container_width=True)
 
 
 # ============================================================
-# ALLOCATION AND LATEST SIGNALS
+# TACTICAL ALLOCATION BAR CHART
 # ============================================================
 
-st.markdown('<div class="section-title">ETF Allocation Over Time</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Tactical Allocation Over Time</div>', unsafe_allow_html=True)
 
-fig_alloc = px.area(
-    active_weights,
-    x=active_weights.index,
-    y=active_weights.columns,
-    title="Monthly Tactical Allocation"
+# Convert monthly weights into yearly average weights.
+# This makes the chart much cleaner and easier to understand than showing every monthly switch.
+try:
+    allocation_bar = active_weights.resample("YE").mean()
+except Exception:
+    allocation_bar = active_weights.resample("Y").mean()
+
+allocation_bar.index = allocation_bar.index.year.astype(str)
+allocation_bar.index.name = "Year"
+
+allocation_long = allocation_bar.reset_index().melt(
+    id_vars="Year",
+    var_name="ETF",
+    value_name="Weight"
+)
+
+allocation_long = allocation_long[allocation_long["Weight"] > 0.001]
+
+fig_alloc = px.bar(
+    allocation_long,
+    x="Year",
+    y="Weight",
+    color="ETF",
+    title="Average ETF Allocation by Year",
+    barmode="stack"
 )
 
 fig_alloc.update_layout(
     template="plotly_dark",
-    height=520,
+    height=620,
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(15,23,42,0.85)",
-    xaxis_title="Date",
-    yaxis_title="Portfolio Weight",
+    xaxis_title="Year",
+    yaxis_title="Average Portfolio Weight",
     hovermode="x unified",
-    legend=dict(orientation="h")
+    legend=dict(
+        title="ETF",
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
 )
+
+fig_alloc.update_yaxes(tickformat=".0%")
 
 st.plotly_chart(fig_alloc, use_container_width=True)
 
+st.markdown(
+    """
+    <div class="executive-card">
+    <b>How to read this chart:</b> Each bar represents one year. The colors show the average portfolio weight allocated to each ETF during that year.
+    A higher SPY or QQQ weight means the model was more growth-oriented. A higher BIL, AGG, TLT, or GLD weight means the model was more defensive.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # ============================================================
 # SIGNAL DASHBOARD
