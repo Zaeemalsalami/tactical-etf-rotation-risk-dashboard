@@ -615,75 +615,90 @@ st.plotly_chart(fig_growth, use_container_width=True)
 
 
 # ============================================================
-# DRAWDOWN AND VOLATILITY
+# DRAWDOWN CONTROL
 # ============================================================
 
-chart_col1, chart_col2 = st.columns(2)
+st.markdown('<div class="section-title">Drawdown Control</div>', unsafe_allow_html=True)
 
-with chart_col1:
-    st.markdown('<div class="section-title">Drawdown Control</div>', unsafe_allow_html=True)
+drawdown_df = pd.DataFrame({
+    column: calculate_drawdown(all_returns[column])
+    for column in all_returns.columns
+})
 
-    drawdown_df = pd.DataFrame({
-        column: calculate_drawdown(all_returns[column])
-        for column in all_returns.columns
-    })
+fig_dd = go.Figure()
 
-    fig_dd = go.Figure()
-
-    for column in drawdown_df.columns:
-        fig_dd.add_trace(
-            go.Scatter(
-                x=drawdown_df.index,
-                y=drawdown_df[column],
-                mode="lines",
-                name=column,
-                line=dict(width=2)
-            )
+for column in drawdown_df.columns:
+    fig_dd.add_trace(
+        go.Scatter(
+            x=drawdown_df.index,
+            y=drawdown_df[column],
+            mode="lines",
+            name=column,
+            line=dict(width=3)
         )
-
-    fig_dd.update_layout(
-        template="plotly_dark",
-        height=460,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,23,42,0.85)",
-        title="Drawdown Comparison",
-        xaxis_title="Date",
-        yaxis_title="Drawdown",
-        hovermode="x unified"
     )
 
-    st.plotly_chart(fig_dd, use_container_width=True)
+fig_dd.update_layout(
+    template="plotly_dark",
+    height=600,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(15,23,42,0.85)",
+    title="Drawdown Comparison",
+    xaxis_title="Date",
+    yaxis_title="Drawdown",
+    hovermode="x unified",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
+)
 
-with chart_col2:
-    st.markdown('<div class="section-title">Rolling Volatility</div>', unsafe_allow_html=True)
+st.plotly_chart(fig_dd, use_container_width=True)
 
-    rolling_vol = all_returns.rolling(12).std() * np.sqrt(12)
 
-    fig_vol = go.Figure()
+# ============================================================
+# ROLLING VOLATILITY
+# ============================================================
 
-    for column in rolling_vol.columns:
-        fig_vol.add_trace(
-            go.Scatter(
-                x=rolling_vol.index,
-                y=rolling_vol[column],
-                mode="lines",
-                name=column,
-                line=dict(width=2)
-            )
+st.markdown('<div class="section-title">Rolling Volatility</div>', unsafe_allow_html=True)
+
+rolling_vol = all_returns.rolling(12).std() * np.sqrt(12)
+
+fig_vol = go.Figure()
+
+for column in rolling_vol.columns:
+    fig_vol.add_trace(
+        go.Scatter(
+            x=rolling_vol.index,
+            y=rolling_vol[column],
+            mode="lines",
+            name=column,
+            line=dict(width=3)
         )
-
-    fig_vol.update_layout(
-        template="plotly_dark",
-        height=460,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(15,23,42,0.85)",
-        title="Rolling 12-Month Annualized Volatility",
-        xaxis_title="Date",
-        yaxis_title="Volatility",
-        hovermode="x unified"
     )
 
-    st.plotly_chart(fig_vol, use_container_width=True)
+fig_vol.update_layout(
+    template="plotly_dark",
+    height=600,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(15,23,42,0.85)",
+    title="Rolling 12-Month Annualized Volatility",
+    xaxis_title="Date",
+    yaxis_title="Annualized Volatility",
+    hovermode="x unified",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
+)
+
+st.plotly_chart(fig_vol, use_container_width=True)
 
 
 # ============================================================
