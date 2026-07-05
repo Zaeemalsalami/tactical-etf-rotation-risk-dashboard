@@ -872,7 +872,7 @@ st.markdown(
 
 st.write("---")
 
-st.st.markdown(
+st.markdown(
     """
     <div style="text-align:center; color:#94a3b8; font-size:14px;">
         Built with Python, Streamlit, Yahoo Finance, Pandas, NumPy, and Plotly<br>
